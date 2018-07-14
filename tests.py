@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+
+"""
+Usage:
+python3 -m unittest tests.BookResolvePathTestCase -v
+
+"""
 import unittest
 
 
@@ -7,6 +14,41 @@ class BookAppTestCase(unittest.TestCase):
     def setUp(self):
         from bookdb import database
         self.db = database
+
+
+class BookResolvePathTestCase(BookAppTestCase):
+    '''
+    added by Eric Rosko for lesson 4 activity
+    '''
+    def test_book_path(self):
+        from bookapp import resolve_path
+        from bookapp import book
+        import types
+        path = '/book/id1'
+        func, args = resolve_path(path)
+        self.assertTrue(isinstance(func, types.FunctionType))
+        self.assertEqual(func, book)
+        self.assertEqual(args,['id1'])
+
+    def test_root_path(self):
+        from bookapp import resolve_path
+        from bookapp import books
+        import types
+        path = '/'
+        func, args = resolve_path(path)
+        self.assertTrue(isinstance(func, types.FunctionType))
+        self.assertEqual(func, books)
+        self.assertEqual(args,[])
+
+
+    def test_favicon_path(self):
+        from bookapp import resolve_path
+        from bookapp import books
+        import types
+        path = '/favicon.ico'
+
+        with self.assertRaises(Exception):
+            func, args = resolve_path(path)
 
 
 class BookDBTestCase(BookAppTestCase):
@@ -29,7 +71,7 @@ class BookDBTestCase(BookAppTestCase):
             self.assertEqual(actual, expected)
 
     def test_title_info_complete(self):
-        use_id, expected = self.db.items()[0]
+        use_id, expected = list(self.db.items())[0]
         actual = self.makeOne().title_info(use_id)
         # demonstrate all actual keys are expected
         for key in actual:
@@ -66,13 +108,13 @@ class ResolvePathTestCase(BookAppTestCase):
 
     def test_book_path_returns_book_function(self):
         from bookapp import book as expected
-        book_id = self.db.keys()[0]
+        book_id = list(self.db.keys())[0]
         path = '/book/{0}'.format(book_id)
         actual, args = self.call_function_under_test(path)
         self.assertTrue(actual is expected)
 
     def test_book_path_returns_bookid_in_args(self):
-        expected = self.db.keys()[0]
+        expected = list(self.db.keys())[0]
         path = '/book/{0}'.format(expected)
         func, actual = self.call_function_under_test(path)
         self.assertTrue(expected in actual)

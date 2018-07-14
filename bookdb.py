@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 class BookDB():
     def titles(self):
